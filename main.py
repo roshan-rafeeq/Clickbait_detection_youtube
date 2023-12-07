@@ -6,7 +6,8 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
-from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import GaussianNB, MultinomialNB, BernoulliNB
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 
@@ -38,6 +39,45 @@ def pp_method_pick(pp_method, data):
         X = tfidf.fit_transform(data)
     return X
 
+clf_method = st.sidebar.selectbox("Select Your Classifier: ", ("SVM", "Naive-Bayes", "Random Forest"))
+model = None
+def clf_method_pick(clf_method):
+    model = None  # Initialize model to None
+    if clf_method == "SVM":
+        function = st.sidebar.selectbox("Select the Function: ", ("Kernel", "Gamma"))
+        if function == "Kernel":
+            Kernel = st.sidebar.selectbox("Select the Kernel parameter: ", ('linear', 'poly', 'rbf', 'sigmoid', 'precomputed'))
+            model = SVC(kernel=Kernel)
+        else:
+            Gamma = st.sidebar.number_input("Gamma Value: ")
+            st.sidebar.write(Gamma)
+            model = SVC(gamma=Gamma)
+    elif clf_method == "Naive-Bayes":
+        nb_method = st.sidebar.selectbox("Select the Naive-Bayes Model: ", ("Multinomial", "Bernoulli"))
+        if nb_method == "Multinomial":
+            Alpha = st.sidebar.number_input("Alpha Value: ")
+            st.sidebar.write(Alpha)
+            model = MultinomialNB(alpha=Alpha)
+        else:
+            Alpha = st.sidebar.number_input("Alpha Value: ")
+            st.sidebar.write(Alpha)
+            model = BernoulliNB(alpha=Alpha)
+    else:
+        n_estimators = st.sidebar.slider("Number of Trees: ", min_value=50, max_value=200, step=50)
+        max_depth = st.sidebar.slider("Maximum Tree Depth: ", min_value=1, max_value=30, step=1)
+        min_samples_split = st.sidebar.slider("Minimum Samples Split: ", min_value=2, max_value=20, step=1)
+        min_samples_leaf = st.sidebar.slider("Minimum Samples Leaf: ", min_value=1, max_value=10, step=1)
+        max_features = st.sidebar.selectbox("Maximum Features: ", ['sqrt', 'log2'])
+
+        model = RandomForestClassifier(
+            n_estimators=n_estimators,
+            max_depth=max_depth,
+            min_samples_split=min_samples_split,
+            min_samples_leaf=min_samples_leaf,
+            max_features=max_features
+        )
+    return model
+
 st.write("Start Preprocessing")
 X = df.title_without_stopwords
 X = pp_method_pick(pp_method, X)
@@ -52,7 +92,7 @@ st.write("Finish Data Splitting (80% Training, 20% Testing)")
 
 # Train a logistic regression model
 st.write("Start Model Training")
-model = SVC(kernel = "linear")
+model = clf_method_pick(clf_method)
 model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
 st.write("Finish Model Training")
@@ -64,10 +104,10 @@ rec = recall_score(y_test, y_pred)
 f1 = f1_score(y_test, y_pred)
 st.write("Finish Model Prediction and Evaluation Scoring")
 
-st.write(f"Accuracy: ", acc)
-st.write(f"Precision: ", prec)
-st.write(f"Recall: ", rec)
-st.write(f"f1: ", f1)
+st.sidebar.write(f"Accuracy: ", acc)
+st.sidebar.write(f"Precision: ", prec)
+st.sidebar.write(f"Recall: ", rec)
+st.sidebar.write(f"f1: ", f1)
 
 # Example input string for prediction
 input_string = st.text_area("YouTube Video Title: ", "Type Your Title Here")
