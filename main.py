@@ -97,7 +97,7 @@ model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
 st.write("Finish Model Training")
 
-st.write("Start Model Prediction and Evaluation Scoring")
+st.write("Start Model Prediction and Evaluation Scoring")   
 st.write("Finish Model Prediction and Evaluation Scoring")
 input_string = st.text_area("YouTube Video Title: ", "Type Your Title Here")
 st.write(input_string)
