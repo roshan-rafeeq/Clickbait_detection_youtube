@@ -98,18 +98,7 @@ y_pred = model.predict(X_test)
 st.write("Finish Model Training")
 
 st.write("Start Model Prediction and Evaluation Scoring")
-acc = accuracy_score(y_test, y_pred)
-prec = precision_score(y_test, y_pred)
-rec = recall_score(y_test, y_pred)
-f1 = f1_score(y_test, y_pred)
 st.write("Finish Model Prediction and Evaluation Scoring")
-
-st.sidebar.write(f"Accuracy: ", acc)
-st.sidebar.write(f"Precision: ", prec)
-st.sidebar.write(f"Recall: ", rec)
-st.sidebar.write(f"f1: ", f1)
-
-# Example input string for prediction
 input_string = st.text_area("YouTube Video Title: ", "Type Your Title Here")
 st.write(input_string)
 
